@@ -3,7 +3,8 @@ const { createError } = require("./error");
 const morgan = require("morgan");
 var cors = require("cors");
 require("dotenv").config
-const connectDB  = require("./DB_Connection/db")
+const connectDB = require("./DB_Connection/db")
+const path = require("path")
 
 const app = express()
 
@@ -38,6 +39,25 @@ app.use(
 //routes
 app.use("/api/chats", chatRoutes)
 app.use("/api/messages", messageRoutes);
+
+
+//-----------------------deployment---------------//
+const __dirname1 = path.resolve()
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/build")))
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1,"frontend","build","index.html"))
+  })
+  
+} else {
+  app.get("/",(req, res)=> {
+    res.send("API running successfully")
+  })
+}
+
+
+//-----------------------deployment---------------//
+
 
 
 const PORT = process.env.PORT || 8081
