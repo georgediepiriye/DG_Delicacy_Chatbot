@@ -166,11 +166,11 @@ const Chat = () => {
   const [chat, setChat] = useState("");
   const [messages, setMesssages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [socketConnected, setSocketConnected] = useState(false);
   const [oneSelected, setOneSelected] = useState(false);
   let socket;
   const ENDPOINT = "https://dg-delicacy.onrender.com/";
   const navigate = useNavigate();
+  socket = io(ENDPOINT);
 
   useEffect(() => {
     const username = window.localStorage.getItem("username");
@@ -194,18 +194,15 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const username = window.localStorage.getItem("username");
     const chat = window.localStorage.getItem("chat").toString();
-    socket = io(ENDPOINT);
-    socket.emit("setup", username);
 
-    socket.on("connection", () => setSocketConnected(true));
+    socket.on("connection", () => {
+      console.log("connected to socket");
+    });
     socket.emit("join chat", chat);
   }, []);
 
   useEffect(() => {
-    socket = io(ENDPOINT);
-
     socket.on("message received", (newMessageReceived) => {
       setTimeout(() => {
         addMessage(newMessageReceived);
@@ -243,7 +240,7 @@ const Chat = () => {
 
     addMessage(newMessageDetails);
 
-    if (messageContent == 1) {
+    if (messageContent === 1) {
       setOneSelected(true);
     }
 
