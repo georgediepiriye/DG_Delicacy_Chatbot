@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
@@ -167,14 +167,15 @@ const Chat = () => {
   const [messages, setMesssages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [oneSelected, setOneSelected] = useState(false);
-  let socket;
-  const ENDPOINT = "https://dg-delicacy.onrender.com/";
+
   const navigate = useNavigate();
-  socket = io(ENDPOINT);
+  const socketRef = useRef(); // create  reference for the socket
+
+  const ENDPOINT = "http://localhost:5000";
 
   useEffect(() => {
     const username = window.localStorage.getItem("username");
-    const chat = window.localStorage.getItem("chat").toString();
+    const chat = window.localStorage.getItem("chat");
 
     if (!username || !chat) {
       navigate("/");
@@ -194,22 +195,28 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const chat = window.localStorage.getItem("chat").toString();
-    socket = io(ENDPOINT);
-    socket.on("connection", () => {
+    const username = window.localStorage.getItem("username");
+    const chat = window.localStorage.getItem("chat");
+    socketRef.current = io(ENDPOINT); // assign the socket value to the ref
+
+    socketRef.current.emit("setup", username);
+
+    socketRef.current.on("connection", () => {
       console.log("connected to socket");
     });
-    socket.emit("join chat", chat);
+    socketRef.current.emit("join chat", chat);
+
+    // cleanup function to close the socket connection
+    return () => {
+      socketRef.current.close();
+    };
   }, []);
 
   useEffect(() => {
-    socket = io(ENDPOINT);
-    socket.on("message received", (newMessageReceived) => {
-      setTimeout(() => {
-        addMessage(newMessageReceived);
-      }, 2000);
+    socketRef.current.on("message received", (message) => {
+      setMesssages((prevMessages) => [...prevMessages, message]);
     });
-  });
+  }, []);
 
   //leave chat
   const leaveChat = () => {
@@ -241,7 +248,7 @@ const Chat = () => {
 
     addMessage(newMessageDetails);
 
-    if (messageContent === 1) {
+    if (messageContent == 1) {
       setOneSelected(true);
     }
 
@@ -282,7 +289,7 @@ const Chat = () => {
       date: date,
     };
 
-    socket.emit("new message", newMessageDetails);
+    socketRef.current.emit("new message", newMessageDetails);
     setNewMessage("");
 
     return;
