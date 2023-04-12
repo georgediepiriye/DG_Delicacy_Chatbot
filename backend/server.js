@@ -78,20 +78,19 @@ io.on("connection", (socket) => {
         console.log("User joined: " + room)
     })
     socket.on("new message",async (newMessageReceived) => {
-        let selectedNumber = newMessageReceived.content;
+      let selectedNumber = parseInt(newMessageReceived.content[0]);
 
       let date = new Date().toJSON();
-        let content = [];
+      let content = [];
 
-     
-      if (selectedNumber == 1) {
+      if (selectedNumber === 1) {
         content = [
           "Here is our menu",
-          "Select 2 to choose jollof rice : N2000",
-          "Select 3 to choose chicken : N4000",
-          "Select 4 to choose fried rice : N2500",
-          "Select 5 to choose plantain : N500",
-          "Select 8 to choose beef meat : N200",
+          "Select 2 to choose jollof rice",
+          "Select 3 to choose chicken",
+          "Select 4 to choose fried rice",
+          "Select 5 to choose plantain",
+          "Select 8 to choose beef meat",
           "Select 97 to see current order",
           "Select 98 to see order history",
           "Select 99 to checkout order",
@@ -101,133 +100,109 @@ io.on("connection", (socket) => {
         let order = new Order({
           user: newMessageReceived.sender,
           order: [],
-          
-        })
-        await order.save()
-        
+        });
+        await order.save();
       } else if (selectedNumber == 2) {
         content = ["Jollof rice added to your tray"];
         await Order.findOneAndUpdate(
           {
             user: newMessageReceived.sender,
-            checkedOut: false, 
-            status:"pending"
-           
+            checkedOut: false,
+            status: "pending",
           },
           {
             $push: { order: "Jollof rice" },
           }
         );
-
-        
       } else if (selectedNumber == 3) {
         content = ["chicken added to your tray"];
-          await Order.findOneAndUpdate(
-            {
-              user: newMessageReceived.sender,
-              checkedOut: false,
-              status: "pending",
-            },
-            {
-              $push: { order: "Chicken" },
-            }
-          );
-      
+        await Order.findOneAndUpdate(
+          {
+            user: newMessageReceived.sender,
+            checkedOut: false,
+            status: "pending",
+          },
+          {
+            $push: { order: "Chicken" },
+          }
+        );
       } else if (selectedNumber == 4) {
         content = ["Fried rice added to your tray"];
-          await Order.findOneAndUpdate(
-            {
-              user: newMessageReceived.sender,
-              checkedOut: false,
-              status: "pending",
-            },
-            {
-              $push: { order: "Fried rice" },
-            }
-          );
-    
+        await Order.findOneAndUpdate(
+          {
+            user: newMessageReceived.sender,
+            checkedOut: false,
+            status: "pending",
+          },
+          {
+            $push: { order: "Fried rice" },
+          }
+        );
       } else if (selectedNumber == 5) {
         content = ["Plantain added to your tray"];
-          await Order.findOneAndUpdate(
-            {
-              user: newMessageReceived.sender,
-              checkedOut: false,
-              status: "pending",
-            },
-            {
-              $push: { order: "Plantain" },
-            }
-          );
-
-     
+        await Order.findOneAndUpdate(
+          {
+            user: newMessageReceived.sender,
+            checkedOut: false,
+            status: "pending",
+          },
+          {
+            $push: { order: "Plantain" },
+          }
+        );
       } else if (selectedNumber == 8) {
         content = ["Beef meat added to your tray"];
-          await Order.findOneAndUpdate(
-            {
-              user: newMessageReceived.sender,
-              checkedOut: false,
-              status: "pending",
-            },
-            {
-              $push: { order: "Beef meat" },
-            }
-          );
-   
-         
+        await Order.findOneAndUpdate(
+          {
+            user: newMessageReceived.sender,
+            checkedOut: false,
+            status: "pending",
+          },
+          {
+            $push: { order: "Beef meat" },
+          }
+        );
       } else if (selectedNumber == 99) {
-        
-       
-         const order =  await Order.findOneAndUpdate(
-             {
-               user: newMessageReceived.sender,
-               checkedOut: false,
-             },
-             {
-               $set: { checkedOut: true },
-             }
+        const order = await Order.findOneAndUpdate(
+          {
+            user: newMessageReceived.sender,
+            checkedOut: false,
+          },
+          {
+            $set: { checkedOut: true },
+          }
         );
         if (order) {
           content = ["order placed"];
         } else {
           content = ["No order to place"];
         }
-         
-       
       } else if (selectedNumber == 98) {
-       
-           const orders = await Order.find({
-             user: newMessageReceived.sender,
-             checkedOut: true,
-          
-           });
+        const orders = await Order.find({
+          user: newMessageReceived.sender,
+          checkedOut: true,
+        });
         if (orders.length > 0) {
-             let newArray = ["Your orders are:"];
-          orders.forEach(eachOrder => {
-         
-           content= newArray.concat(eachOrder.order)
-           
-          })
-           
-          
+          let newArray = ["Your orders are:"];
+          orders.forEach((eachOrder) => {
+            content = newArray.concat(eachOrder.order);
+          });
         } else {
-          content = ["No order history"]
+          content = ["No order history"];
         }
       } else if (selectedNumber == 97) {
-        const order =   await Order.findOne(
-            {
-              user: newMessageReceived.sender,
-            checkedOut: true,
-               status:"pending"
-            },
-          );
+        const order = await Order.findOne({
+          user: newMessageReceived.sender,
+          checkedOut: true,
+          status: "pending",
+        });
         if (!order) {
-          content = ["You haven't made an order yet,please make an order"]
-        } 
-        else {
-          content = order.order
+          content = ["You haven't made an order yet,please make an order"];
+        } else {
+          content = order.order;
         }
       } else if (selectedNumber == 0) {
-      let cancelledOrder =  await Order.findOneAndUpdate(
+        let cancelledOrder = await Order.findOneAndUpdate(
           {
             user: newMessageReceived.sender,
             checkedOut: true,
@@ -242,8 +217,6 @@ io.on("connection", (socket) => {
         } else {
           content = ["No order to cancel"];
         }
-        
-        
       } else {
         content = ["please select a valid number"];
       }
