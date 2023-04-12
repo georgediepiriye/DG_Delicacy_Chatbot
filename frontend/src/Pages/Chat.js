@@ -248,7 +248,7 @@ const Chat = () => {
 
     addMessage(newMessageDetails);
 
-    if (messageContent == 1) {
+    if (messageContent === 1) {
       setOneSelected(true);
     }
 
