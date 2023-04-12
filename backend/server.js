@@ -3,21 +3,18 @@ const { createError } = require("./error");
 const morgan = require("morgan");
 var cors = require("cors");
 require("dotenv").config
-const connectDB = require("./DB_Connection/db")
-const path = require("path")
+const connectDB = require("./DB_Connection/db");
 
-const app = express()
+const app = express();
 
 //routes
-const chatRoutes = require("./routes/chatRoutes")
+const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const Order = require("./models/OrderModel");
 
-
-
 //middlewares
 app.use(morgan("dev"));
-app.use(express.json())
+app.use(express.json());
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -37,30 +34,10 @@ app.use(
 );
 
 //routes
-app.use("/api/chats", chatRoutes)
+app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
 
-
-//-----------------------deployment---------------//
-const __dirname1 = path.resolve()
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname1, "/frontend/build")))
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname1,"frontend","build","index.html"))
-  })
-  
-} else {
-  app.get("/",(req, res)=> {
-    res.send("API running successfully")
-  })
-}
-
-
-//-----------------------deployment---------------//
-
-
-
-const PORT = process.env.PORT || 8081
+const PORT = process.env.PORT || 8081;
 
 //unavailable routes
 app.use("*", (req, res, next) => {
@@ -79,16 +56,16 @@ app.use((err, req, res, next) => {
 });
 
 const server = app.listen(PORT, () => {
-    console.log("server running..")
-    connectDB();
-})
+  console.log("server running..");
+  connectDB();
+});
 
 const io = require("socket.io")(server, {
-    pingTimeout: 60000,
-    cors: {
-        origin:"http://localhost:3000"
-    }
-})
+  pingTimeout: 60000,
+  cors: {
+    origin: "*",
+  },
+});
 
 io.on("connection", (socket) => {
     console.log("connected to socket.io")

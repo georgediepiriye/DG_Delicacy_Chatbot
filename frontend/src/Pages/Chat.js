@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ScrollableFeed from "react-scrollable-feed";
 import moment from "moment";
@@ -171,7 +169,7 @@ const Chat = () => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [oneSelected, setOneSelected] = useState(false);
   let socket;
-  const ENDPOINT = "http://localhost:5000";
+  const ENDPOINT = "https://dg-delicacy.onrender.com/";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -212,8 +210,6 @@ const Chat = () => {
       setTimeout(() => {
         addMessage(newMessageReceived);
       }, 2000);
-
-      console.log(newMessageReceived);
     });
   });
 
@@ -288,21 +284,12 @@ const Chat = () => {
       date: date,
     };
 
-    console.log(newMessageDetails);
-
     socket.emit("new message", newMessageDetails);
     setNewMessage("");
 
     return;
   };
 
-  //notification for error
-  const notifyError = (message) => {
-    toast.error(message, {
-      position: toast.POSITION.TOP_CENTER,
-      autoClose: false,
-    });
-  };
   return (
     <Container>
       <Wrapper>

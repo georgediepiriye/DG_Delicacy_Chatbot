@@ -120,7 +120,7 @@ const Homepage = () => {
       setIsLoading(true);
       setTimeout(async () => {
         const res = await axios
-          .post(`http://localhost:5000/api/chats`, {
+          .post(`https://dg-delicacy-backend.onrender.com/api/chats`, {
             username,
           })
           .catch((e) => {
