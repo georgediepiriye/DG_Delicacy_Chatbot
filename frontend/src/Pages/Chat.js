@@ -195,7 +195,7 @@ const Chat = () => {
 
   useEffect(() => {
     const chat = window.localStorage.getItem("chat").toString();
-
+    socket = io(ENDPOINT);
     socket.on("connection", () => {
       console.log("connected to socket");
     });
@@ -203,6 +203,7 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
+    socket = io(ENDPOINT);
     socket.on("message received", (newMessageReceived) => {
       setTimeout(() => {
         addMessage(newMessageReceived);
