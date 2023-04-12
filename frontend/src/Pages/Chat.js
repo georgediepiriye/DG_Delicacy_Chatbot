@@ -171,7 +171,7 @@ const Chat = () => {
   const navigate = useNavigate();
   const socketRef = useRef(); // create  reference for the socket
 
-  const ENDPOINT = "http://localhost:5000";
+  const ENDPOINT = "https://dg-delicacy-backend.onrender.com";
 
   useEffect(() => {
     const username = window.localStorage.getItem("username");
